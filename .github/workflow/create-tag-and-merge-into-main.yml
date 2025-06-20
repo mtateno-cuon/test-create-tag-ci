@@ -1,0 +1,59 @@
+name: Create Tag And Merge Into Main
+
+on:
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+
+      - name: Get package.json version
+        run: echo "VERSION=version-$(jq -r .version package.json)" >> $GITHUB_ENV
+
+      - name: Check if commit is a merge commit
+        id: check_release_branch
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == release/* ]]; then
+            echo "IS_RELEASE_BRANCH=true" >> $GITHUB_ENV
+          else
+            echo "IS_RELEASE_BRANCH=false" >> $GITHUB_ENV
+          fi
+
+      - name: Create and push tag
+        if: env.IS_RELEASE_BRANCH == 'true'
+        run: |
+          git tag $VERSION $GITHUB_REF_NAME
+          git push origin $VERSION
+
+      - name: Create GitHub Release with Auto-generated Notes
+        if: env.IS_RELEASE_BRANCH == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION }}
+          generate_release_notes: true
+
+      - name: Merge release branch into main
+        if: env.IS_RELEASE_BRANCH == 'true'
+        run: |
+          git fetch origin main
+          git checkout main
+          git pull origin main
+          git merge --no-ff $GITHUB_REF_NAME -m "Merge release branch $GITHUB_REF_NAME"
+          git push origin main
+
+      # ブランチを削除する際に有効化
+      # - name: Delete release branch
+      #   run: |
