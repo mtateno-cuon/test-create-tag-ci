@@ -1,0 +1,54 @@
+{
+  "name": "cgas",
+  "version": "1.0.0",
+  "private": true,
+  "prisma": {
+    "schema": "packages/database/prisma/schema.prisma"
+  },
+  "scripts": {
+    "build": "turbo run build --env-mode=loose",
+    "db:migrate:deploy": "turbo run db:migrate:deploy",
+    "db:migrate:dev": "turbo run db:migrate:dev",
+    "db:migrate:test": "turbo run db:migrate:test",
+    "db:seed:dev": "turbo run db:seed:dev",
+    "db:seed:production": "turbo run db:seed:production",
+    "db:reset": "turbo run db:reset",
+    "dev": "turbo run dev",
+    "start": "turbo run start",
+    "aiassistants": "turbo run aiassistants#start --env-mode=loose",
+    "essentials": "turbo run essentials#start --env-mode=loose",
+    "model-endpoints": "turbo run model-endpoints#start --env-mode=loose",
+    "service-admin": "turbo run service-admin#start --env-mode=loose",
+    "ragaas-gateway": "turbo run ragaas-gateway#start --env-mode=loose",
+    "prisma:generate": "turbo run prisma:generate",
+    "format-and-lint": "biome check ./apps/**/ ./packages/**/",
+    "format-and-lint:fix": "biome check --write ./apps/**/ ./packages/**/",
+    "test": "DATABASE_URL=postgresql://postgres@db:5432/test MODEL_ENDPOINTS_DATABASE_URL=postgresql://postgres@db:5432/test_model_endpoints SERVICE_ADMIN_DATABASE_URL=postgresql://postgres@db:5432/test_service_admin turbo run test",
+    "test:ci": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "generate:openapi-docs": "turbo run generate:openapi-docs",
+    "check-deps": "knip --config knip.config.ts",
+    "fix-deps": "knip --config knip.config.ts --fix"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.14.0",
+    "knip": "^5.59.1",
+    "prisma": "^6.5.0",
+    "tsx": "^4.19.3",
+    "turbo": "^2.4.4",
+    "typescript": "^5.8.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.5.0"
+  },
+  "packageManager": "pnpm@10.7.0",
+  "pnpm": {
+    "overrides": {
+      "prismjs@<1.30.0": ">=1.30.0"
+    }
+  }
+}
